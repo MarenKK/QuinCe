@@ -55,8 +55,8 @@ public class DataFileDB {
    * @see #storeNewFile(DataSource, Properties, DataFile)
    */
   private static final String ADD_FILE_STATEMENT = "INSERT INTO data_file "
-    + "(file_definition_id, filename, start_date, end_date, record_count) "
-    + "VALUES (?, ?, ?, ?, ?)";
+    + "(file_definition_id, filename, start_date, end_date, record_count,hashsum) "
+    + "VALUES (?, ?, ?, ?, ?,?)";
 
   /**
    * Statement to add a data file to the database
@@ -64,7 +64,7 @@ public class DataFileDB {
    * @see #replaceFile(DataSource, Properties, DataFile, long)
    */
   private static final String REPLACE_FILE_STATEMENT = "UPDATE data_file "
-    + "SET filename = ?, start_date = ?, end_date = ?, record_count = ? "
+    + "SET filename = ?, start_date = ?, end_date = ?, record_count = ?, hashsum = ?"
     + "WHERE id = ?";
 
   /**
@@ -72,7 +72,7 @@ public class DataFileDB {
    */
   private static final String GET_FILENAME_QUERY = "SELECT "
     + "f.id, f.file_definition_id, f.filename, f.start_date, "
-    + "f.end_date, f.record_count, i.id FROM data_file AS f "
+    + "f.end_date, f.record_count, f.hashsum, i.id FROM data_file AS f "
     + "INNER JOIN file_definition AS d ON f.file_definition_id = d.id "
     + "INNER JOIN instrument AS i ON d.instrument_id = i.id " + "WHERE f.id IN "
     + DatabaseUtils.IN_PARAMS_TOKEN + " ORDER BY f.start_date ASC";
@@ -83,31 +83,31 @@ public class DataFileDB {
    * @see #getUserFiles(DataSource, User)
    */
   private static final String GET_FILES_QUERY = "SELECT "
-    + "f.id, f.file_definition_id, f.filename, f.start_date, f.end_date, f.record_count, i.id "
+    + "f.id, f.file_definition_id, f.filename, f.start_date, f.end_date, f.record_count, f.hashsum, i.id "
     + "FROM data_file AS f "
     + "INNER JOIN file_definition AS d ON f.file_definition_id = d.id "
     + "INNER JOIN instrument AS i ON d.instrument_id = i.id "
     + "ORDER BY f.start_date ASC";
 
   /**
-   * Query to find all the data files owned by a given user
+   * Query to find all the data files owned by a given user BY INSTRUMENT
    *
    * @see #getUserFiles(DataSource, User)
    */
   private static final String GET_FILES_BY_INSTRUMENT_QUERY = "SELECT "
-    + "f.id, f.file_definition_id, f.filename, f.start_date, f.end_date, f.record_count, i.id "
+    + "f.id, f.file_definition_id, f.filename, f.start_date, f.end_date, f.record_count, f.hashsum, i.id "
     + "FROM data_file AS f "
     + "INNER JOIN file_definition AS d ON f.file_definition_id = d.id "
     + "INNER JOIN instrument AS i ON d.instrument_id = i.id "
     + "WHERE d.instrument_id = ? ORDER BY f.start_date ASC";
 
   /**
-   * Query to find all the data files owned by a given user
+   * Query to find all the data files owned by a given user BY DATE
    *
    * @see #getUserFiles(DataSource, User)
    */
   private static final String GET_FILES_AFTER_DATE_QUERY = "SELECT "
-    + "f.id, f.file_definition_id, f.filename, f.start_date, f.end_date, f.record_count, i.id "
+    + "f.id, f.file_definition_id, f.filename, f.start_date, f.end_date, f.record_count, f.hashsum, i.id "
     + "FROM data_file AS f "
     + "INNER JOIN file_definition AS d ON f.file_definition_id = d.id "
     + "INNER JOIN instrument AS i ON d.instrument_id = i.id "
@@ -287,6 +287,7 @@ public class DataFileDB {
       stmt.setLong(3, DateTimeUtils.dateToLong(dataFile.getStartDate()));
       stmt.setLong(4, DateTimeUtils.dateToLong(dataFile.getEndDate()));
       stmt.setInt(5, dataFile.getRecordCount());
+      stmt.setString(6, dataFile.getHashsum());
 
       stmt.execute();
 
@@ -370,6 +371,7 @@ public class DataFileDB {
         stmt.setLong(3, DateTimeUtils.dateToLong(dataFile.getEndDate()));
         stmt.setInt(4, dataFile.getRecordCount());
         stmt.setLong(5, replacementId);
+        stmt.setString(6, dataFile.getHashsum());
 
         stmt.execute();
 

@@ -1,10 +1,12 @@
 package uk.ac.exeter.QuinCe.data.Files;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -98,6 +100,8 @@ public class DataFile {
    * Run types in this file not defined in the file definition
    */
   private Set<RunTypeAssignment> missingRunTypes = new HashSet<RunTypeAssignment>();
+
+  private Formatter formatter;
 
   public List<RunTypeAssignment> getMissingRunTypes() {
     List<RunTypeAssignment> list = new ArrayList<>(missingRunTypes);
@@ -752,6 +756,31 @@ public class DataFile {
    */
   public byte[] getBytes() throws IOException {
     return FileStore.getBytes(fileStore, this);
+  }
+
+  /***
+   * Get the sha256 hashsum for a file
+   *
+   * @return hashsum
+   */
+  public String getHashsum() {
+
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+      byte[] content = md.digest(this.getContents().getBytes());
+
+      formatter = new Formatter();
+      for (byte b : content) {
+        formatter.format("%02x", b);
+      }
+      return formatter.toString();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+
   }
 
   /**
