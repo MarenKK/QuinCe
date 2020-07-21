@@ -2,18 +2,20 @@ package db_migrations;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Formatter;
 import java.util.Properties;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-
-import uk.ac.exeter.QuinCe.data.Files.DataFile;
-import uk.ac.exeter.QuinCe.data.Files.DataFileDB;
 
 /**
  * Migration to add the hashsum of each file entry in the database.
@@ -32,49 +34,13 @@ public class V9__file_ingester_hashsums_1777 extends BaseJavaMigration {
     // Update data_file table to include hashsum column
     addHashsumColumn(conn);
 
-    // calculate hashsums for all entries in data_file
-    String filePath = "configuration/qc_routines_config.csv";
+    // Fetch local path of FileStore
+    String FileStorePath = getFileStorePath();
 
-    System.out.println(filePath);
+    MessageDigest shaDigest = MessageDigest.getInstance("SHA-256");
 
-    // FETCH LIST OF FILES
-    Properties result = new Properties();
-    result.load(new FileInputStream(new File(filePath)));
-    System.out.println(result);
-
-    List<DataFile> Files = DataFileDB.getFiles(conn, result, null);
-
-    for (DataFile File : Files) {
-      System.out.println(File);
-
-    }
-
-    /*
-     * Get list of files using dataFileDB.getFiles
-     *
-     * instrument = Null returns all files appConfig contains the path to
-     * FileStore
-     *
-     * Use relational path from QuinCe-folder to access
-     * configuration/quince.properties Use lines from
-     * ResourceManager.loadConfiguration to create a properties-object See
-     * CreateNrtDataset line 98 for inspiration
-     *
-     *
-     *
-     * For each item in list: - get content - create hashsum - update table
-     * using SQL query
-     *
-     */
-
-  }
-
-  private List<Long> getFiles(Connection conn) throws SQLException {
-
-    // Get the record count
-
-    int fileId;
-    int instrumentId;
+    int fileId = 0;
+    int instrumentId = 0;
 
     try (PreparedStatement getStmt = conn
       .prepareStatement("SELECT id, file_definition_id  FROM data_file")) {
@@ -83,12 +49,39 @@ public class V9__file_ingester_hashsums_1777 extends BaseJavaMigration {
         while (fileIds.next()) {
           fileId = fileIds.getInt(1);
           instrumentId = fileIds.getInt(2);
-          System.out.println(fileId);
+          String filepath = FileStorePath + "/" + instrumentId + "/" + fileId;
+
+          if (new File(filepath).exists()) {
+            // Calculate checksum using SHA-256 algorithm
+            String shaChecksum = getFileChecksum(shaDigest, filepath);
+            updateTable(conn, fileId, shaChecksum);
+          }
         }
       }
     }
+  }
 
-    return null;
+  private void updateTable(Connection conn, int fileId, String shaChecksum)
+    throws SQLException {
+    // Add column hashsum to data_file table
+    try (PreparedStatement newMeasIdStmt = conn
+      .prepareStatement("UPDATE " + "data_file SET hashsum = ? WHERE id = ?")) {
+
+      newMeasIdStmt.setString(1, shaChecksum);
+      newMeasIdStmt.setLong(2, fileId);
+
+      newMeasIdStmt.execute();
+    }
+  }
+
+  private String getFileStorePath() throws FileNotFoundException, IOException {
+    //
+    String QuinceProperties = "configuration/quince.properties";
+
+    Properties result = new Properties();
+    result.load(new FileInputStream(new File(QuinceProperties)));
+
+    return result.getProperty("filestore");
   }
 
   private void addHashsumColumn(Connection conn) throws SQLException {
@@ -99,4 +92,16 @@ public class V9__file_ingester_hashsums_1777 extends BaseJavaMigration {
     }
   }
 
+  private String getFileChecksum(MessageDigest md, String filepath)
+    throws IOException {
+
+    byte[] content = md.digest(Files.readAllBytes(Paths.get(filepath)));
+
+    Formatter formatter = new Formatter();
+    for (byte b : content) {
+      formatter.format("%02x", b);
+    }
+    return formatter.toString();
+
+  }
 }
