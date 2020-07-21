@@ -552,7 +552,8 @@ public class DataFileDB {
    * @see #makeDataFile(ResultSet, String, Connection)
    */
   public static List<DataFile> getFiles(DataSource dataSource,
-    Properties appConfig, Long instrumentId) throws DatabaseException {
+    Properties appConfig, Long instrumentId)
+    throws MissingParamException, DatabaseException {
 
     try (Connection conn = dataSource.getConnection()) {
       return getFiles(conn, appConfig, instrumentId);
