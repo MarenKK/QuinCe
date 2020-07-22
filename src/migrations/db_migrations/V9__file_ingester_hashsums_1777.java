@@ -11,11 +11,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Formatter;
 import java.util.Properties;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+
+import uk.ac.exeter.QuinCe.data.Files.DataFile;
 
 /**
  * Migration to add the hashsum of each file entry in the database.
@@ -95,13 +96,7 @@ public class V9__file_ingester_hashsums_1777 extends BaseJavaMigration {
   private String getFileChecksum(MessageDigest md, String filepath)
     throws IOException {
 
-    byte[] content = md.digest(Files.readAllBytes(Paths.get(filepath)));
-
-    Formatter formatter = new Formatter();
-    for (byte b : content) {
-      formatter.format("%02x", b);
-    }
-    return formatter.toString();
+    return DataFile.calculateHashsum(Files.readAllBytes(Paths.get(filepath)));
 
   }
 }

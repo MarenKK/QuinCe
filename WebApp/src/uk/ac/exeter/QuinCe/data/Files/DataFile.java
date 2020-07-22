@@ -101,8 +101,6 @@ public class DataFile {
    */
   private Set<RunTypeAssignment> missingRunTypes = new HashSet<RunTypeAssignment>();
 
-  private Formatter formatter;
-
   public List<RunTypeAssignment> getMissingRunTypes() {
     List<RunTypeAssignment> list = new ArrayList<>(missingRunTypes);
     Collections.sort(list);
@@ -766,11 +764,19 @@ public class DataFile {
   public String getHashsum() {
 
     try {
+      return calculateHashsum(this.getContents().getBytes());
+    } catch (DataFileException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public static String calculateHashsum(byte[] bytes) {
+    try (Formatter formatter = new Formatter()) {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-      byte[] content = md.digest(this.getContents().getBytes());
+      byte[] content = md.digest(bytes);
 
-      formatter = new Formatter();
       for (byte b : content) {
         formatter.format("%02x", b);
       }
@@ -780,7 +786,6 @@ public class DataFile {
       e.printStackTrace();
       return null;
     }
-
   }
 
   /**
