@@ -78,6 +78,17 @@ public class DataFileDB {
     + DatabaseUtils.IN_PARAMS_TOKEN + " ORDER BY f.start_date ASC";
 
   /**
+   * Query to get a set of data files by their hashsum
+   */
+  private static final String GET_FILE_BY_HASHSUM_QUERY = "SELECT "
+    + "f.id, f.file_definition_id, f.filename, f.start_date, "
+    + "f.end_date, f.record_count, f.hashsum, i.id FROM data_file AS f "
+    + "INNER JOIN file_definition AS d ON f.file_definition_id = d.id "
+    + "INNER JOIN instrument AS i ON d.instrument_id = i.id "
+    + "WHERE f.hashsum IN " + DatabaseUtils.IN_PARAMS_TOKEN
+    + " ORDER BY f.start_date ASC";
+
+  /**
    * Query to find all the data files owned by a given user BY INSTRUMENT
    *
    * @see #getUserFiles(DataSource, User)
@@ -117,6 +128,15 @@ public class DataFileDB {
    */
   private static final String FIND_FILE_BY_ID_QUERY = "SELECT "
     + "id FROM data_file WHERE id = ?";
+  /**
+   * Query to find a file using its database ID
+   *
+   * @see #getFileDetails(Connection, long)
+   * @see #makeFileInfo(ResultSet, Connection)
+   * @see #fileExists(Connection, long)
+   */
+  private static final String FIND_FILE_BY_HASHSUM_QUERY = "SELECT "
+    + "filename FROM data_file WHERE hashsum = ?";
 
   /**
    * Query to determine if a file exists covering two dates
@@ -530,6 +550,56 @@ public class DataFileDB {
     }
 
     return result;
+  }
+
+  /**
+   * Determines whether a file with the specified ID exists in the database
+   *
+   * @param conn
+   *          A database connection
+   * @param hashsum
+   *          The file hashsum
+   * @return {@code true} if the file exists; {@code false} if it does not
+   * @throws MissingParamException
+   *           If any parameters are missing
+   * @throws DatabaseException
+   *           If an error occurs
+   * @throws RecordNotFoundException
+   *           If the file disappears between locating it and reading its
+   *           details
+   * @throws SQLException
+   */
+  public static String hashsumExists(DataSource dataSource, String hashsum)
+    throws MissingParamException, DatabaseException, RecordNotFoundException,
+    SQLException {
+
+    MissingParam.checkMissing(dataSource, "dataSource");
+    MissingParam.checkMissing(hashsum, "hashsum");
+
+    Connection conn = dataSource.getConnection();
+
+    String filename = null;
+
+    PreparedStatement stmt = null;
+    ResultSet records = null;
+
+    try {
+      stmt = conn.prepareStatement(FIND_FILE_BY_HASHSUM_QUERY);
+      stmt.setString(1, hashsum);
+      records = stmt.executeQuery();
+      if (records.next()) {
+        filename = records.getString(1);
+
+      }
+    } catch (SQLException e) {
+      throw new DatabaseException(
+        "An error occurred while checking file existence", e);
+    } finally {
+      DatabaseUtils.closeResultSets(records);
+      DatabaseUtils.closeStatements(stmt);
+    }
+
+    return filename;
   }
 
   /**

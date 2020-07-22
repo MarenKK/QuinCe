@@ -317,6 +317,44 @@ public abstract class UploadedDataFile {
       }
 
       if (!fileEmpty) {
+
+        String content = getFileContents();
+        String hashsum = DataFile.calculateHashsum(content.getBytes());
+
+        System.out.println(hashsum);
+
+        String hashFilename = DataFileDB.hashsumExists(dataSource, hashsum);
+
+        System.out.println(hashFilename);
+
+        System.out.println(this.getName());
+
+        System.out.println(hashFilename.equals(this.getName()));
+
+        /*
+         * calculate checksum - done
+         *
+         * check database for matching checksum done hashsum exists return -
+         * done filename if exists, else it returns null. - confirmed
+         *
+         * ADD LOGIC FOR FURTHER STEPS
+         *
+         * IF hashsum exist: IF filename match: http202 accepted ELSE: (filename
+         * don't match) Status: CONFLICT ELSE: (proceed)
+         * 
+         *
+         *
+         * if no match proceed
+         *
+         * if match: check filename, if match: http202 accepted, file exists due
+         * nothing.
+         *
+         * if no match: conflict. reject file. identical file found under
+         * different filename
+         *
+         *
+         */
+
         FileDefinitionBuilder layoutGuesser = new FileDefinitionBuilder(
           "Guesser", fileDefinitions);
 
