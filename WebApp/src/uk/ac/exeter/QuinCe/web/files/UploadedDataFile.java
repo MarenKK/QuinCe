@@ -341,7 +341,7 @@ public abstract class UploadedDataFile {
          *
          * IF hashsum exist: IF filename match: http202 accepted ELSE: (filename
          * don't match) Status: CONFLICT ELSE: (proceed)
-         * 
+         *
          *
          *
          * if no match proceed
