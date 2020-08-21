@@ -400,7 +400,9 @@ public abstract class PlotPageData {
         List<PlotPageColumnHeading> groupColumns = group.getValue();
 
         // Each column group must contain at least one column
-        if (null == groupColumns || groupColumns.size() == 0) {
+        // if (null == groupColumns || groupColumns.size() == 0) {
+        // if statement modified to include empty group columns MKK 20200821
+        if (null == groupColumns) {
           error("Empty column group detected",
             new Exception("Empty column group '" + group.getKey() + "'"));
         } else {
