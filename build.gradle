@@ -25,6 +25,8 @@ plugins {
 }
 
 apply plugin: 'java'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 apply plugin: 'war'
 apply plugin: 'org.gretty'
 apply plugin: 'eclipse-wtp'
