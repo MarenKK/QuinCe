@@ -1,12 +1,14 @@
 package uk.ac.exeter.QuinCe.data.Instrument.SensorDefinition;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 
 import uk.ac.exeter.QuinCe.data.Dataset.QC.Flag;
 import uk.ac.exeter.QuinCe.data.Dataset.QC.InvalidFlagException;
@@ -327,6 +329,21 @@ public class InstrumentVariable {
 
     return result;
   }
+  
+  public TreeSet<String> getInternalCalibrations() {
+	    TreeSet<String> result = new TreeSet<String>();
+
+	    for (SensorType sensorType : getAllSensorTypes(false)) {
+	      if (sensorType.hasInternalCalibration()) {
+	        result.add(sensorType.getName());
+	      }
+	    }
+	    System.out.println(result);
+
+	    return result;
+	  }
+  
+  // make get Internal Calibrations return list of sensorTypes with internal Calibration
 
   @Override
   public int hashCode() {
