@@ -4,7 +4,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import uk.ac.exeter.QuinCe.data.Instrument.Instrument;
+import uk.ac.exeter.QuinCe.data.Instrument.InstrumentDB;
+import uk.ac.exeter.QuinCe.data.Instrument.RunTypes.RunTypeCategoryConfiguration;
+import uk.ac.exeter.QuinCe.data.Instrument.SensorDefinition.SensorsConfiguration;
 import uk.ac.exeter.QuinCe.utils.ParameterException;
+import uk.ac.exeter.QuinCe.web.system.ResourceManager;
 
 /**
  * Represents a external standard calibration
@@ -15,18 +22,6 @@ import uk.ac.exeter.QuinCe.utils.ParameterException;
 public class ExternalStandard extends Calibration {
 
   /**
-   * Contains the label for the concentration value (constructed in the
-   * {@code static} block)
-   */
-  private static List<String> valueNames;
-
-  static {
-    valueNames = new ArrayList<String>(1);
-    valueNames.add("xCO₂ (with standards)");
-    valueNames.add("xH₂O (with standards)");
-  }
-
-  /**
    * Create an empty external standard placeholder that isn't bound to a
    * particular standard
    *
@@ -35,6 +30,7 @@ public class ExternalStandard extends Calibration {
    */
   public ExternalStandard(long instrumentId) {
     super(instrumentId, ExternalStandardDB.EXTERNAL_STANDARD_CALIBRATION_TYPE);
+    
   }
 
   /**
@@ -79,10 +75,21 @@ public class ExternalStandard extends Calibration {
       }
     }
   }
-
-  @Override
+@Override
   public List<String> getCoefficientNames() {
-    return valueNames;
+	  try {
+		  DataSource dataSrc = ResourceManager.getInstance().getDBDataSource();
+		  SensorsConfiguration sensorConfig = ResourceManager.getInstance().getSensorsConfiguration();
+		  RunTypeCategoryConfiguration runTypeConfig = ResourceManager.getInstance().getRunTypeCategoryConfiguration();
+		  
+		  Instrument instrument = InstrumentDB.getInstrument(dataSrc, instrumentId, sensorConfig, runTypeConfig);
+		  List<String> test = new ArrayList<String>(instrument.getInternalCalibrations());
+		  System.out.println(test);
+		  return test;
+		  }
+	  catch(Exception e) {
+		  return null;
+	  }
   }
 
   @Override

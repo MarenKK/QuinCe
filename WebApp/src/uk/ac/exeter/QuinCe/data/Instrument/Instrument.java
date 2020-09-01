@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import uk.ac.exeter.QuinCe.User.User;
 import uk.ac.exeter.QuinCe.data.Instrument.RunTypes.RunTypeAssignment;
@@ -518,7 +519,19 @@ public class Instrument {
   public void setDepth(int depth) {
     this.depth = depth;
   }
+  
+  public TreeSet<String> getInternalCalibrations() {
+	    TreeSet<String> result = new TreeSet<String>();
 
+	    for (InstrumentVariable variable : variables) {
+	      if (variable.hasInternalCalibrations()) {
+	        result.addAll(variable.getInternalCalibrations());
+	      }
+	    }
+	    System.out.println(result);
+	    return result; // return list
+	  }
+  
   public boolean hasInternalCalibrations() {
     boolean result = false;
 

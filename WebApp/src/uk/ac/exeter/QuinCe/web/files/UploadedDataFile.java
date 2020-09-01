@@ -329,7 +329,7 @@ public abstract class UploadedDataFile {
 
         System.out.println(this.getName());
 
-        System.out.println(hashFilename.equals(this.getName()));
+        //System.out.println(hashFilename.equals(this.getName()));
 
         /*
          * calculate checksum - done

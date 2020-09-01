@@ -40,7 +40,7 @@ public abstract class Calibration implements Comparable<Calibration> {
   /**
    * The instrument to which this calibration belongs
    */
-  private long instrumentId;
+  protected long instrumentId;
 
   /**
    * The calibration type
