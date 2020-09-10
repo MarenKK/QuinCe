@@ -221,7 +221,7 @@ def makenetcdf(datasetname, fieldconfig, platform, records):
   nc.institution_edmo_code = "4595"
   nc.institution_references = " "
   nc.contact = "bcdc@uib.no cmems-service@ifremer.fr"
-  nc.title = "Global Ocean - In Situ near-real time carbon observations"
+  nc.title = "Global Ocean - In Situ near-real time carbon observation"
   nc.author = "cmems-service"
   nc.naming_authority = "Copernicus Marine In Situ"
   nc.doi = ""
