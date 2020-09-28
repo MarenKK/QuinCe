@@ -445,10 +445,11 @@ public class DataSetsBean extends BaseManagedBean {
             if (!standards.isComplete()) {
               validCalibration = false;
               validCalibrationMessage = "No complete set of external standards is available";
-            } else if (!ExternalStandardDB.hasZeroStandard(standards)) {
-              validCalibration = false;
-              validCalibrationMessage = "One external standard must have a zero concentration";
-            }
+            } // else if (!ExternalStandardDB.hasZeroStandard(standards)) {
+              // validCalibration = false;
+              // validCalibrationMessage = "One external standard must have a
+              // zero concentration";
+            // }
           }
 
         }

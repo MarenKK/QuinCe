@@ -115,6 +115,14 @@ public abstract class Calibration implements Comparable<Calibration> {
    */
   public abstract List<String> getCoefficientNames();
 
+//  public List<String> getCoefficientNames() {
+//
+//    return getEditableCoefficients().stream().map(c -> {
+//      System.out.println(c.getName());
+//      return c.getName();
+//    }).collect(Collectors.toList());
+//  }
+
   /**
    * Get the type of the calibration. This is provided by each of the concrete
    * implementations of the class
@@ -148,7 +156,6 @@ public abstract class Calibration implements Comparable<Calibration> {
         result = buildHumanReadableCoefficients();
       }
     }
-
     return result;
   }
 
@@ -158,7 +165,17 @@ public abstract class Calibration implements Comparable<Calibration> {
    *
    * @return The human-readable coefficients
    */
-  protected abstract String buildHumanReadableCoefficients();
+  protected String buildHumanReadableCoefficients() {
+    StringBuilder result = new StringBuilder();
+
+    for (CalibrationCoefficient c : getEditableCoefficients()) {
+      if (result.length() != 0) {
+        result.append("; ");
+      }
+      result.append(c.toString());
+    }
+    return result.toString();
+  }
 
   /**
    * Get the calibration target
@@ -234,8 +251,7 @@ public abstract class Calibration implements Comparable<Calibration> {
    * Initialise the coefficients for this calibration with zero values
    */
   protected void initialiseCoefficients() {
-    coefficients = new ArrayList<CalibrationCoefficient>(
-      getCoefficientNames().size());
+    coefficients = new ArrayList<CalibrationCoefficient>();
 
     for (String name : getCoefficientNames()) {
       coefficients.add(new CalibrationCoefficient(name));
@@ -248,7 +264,7 @@ public abstract class Calibration implements Comparable<Calibration> {
    * @return The coefficients
    */
   public List<CalibrationCoefficient> getCoefficients() {
-    if (null == coefficients) {
+    if (null == coefficients || coefficients.isEmpty()) {
       initialiseCoefficients();
     }
     return coefficients;
@@ -322,7 +338,9 @@ public abstract class Calibration implements Comparable<Calibration> {
    * @return {@code true} if the coefficients are valid; {@code false} if they
    *         are not
    */
-  public abstract boolean coefficientsValid();
+  public boolean coefficientsValid() {
+    return true;
+  }
 
   @Override
   public int compareTo(Calibration o) {

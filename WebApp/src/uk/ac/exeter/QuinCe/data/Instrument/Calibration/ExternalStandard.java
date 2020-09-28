@@ -86,83 +86,14 @@ public class ExternalStandard extends Calibration {
 
       Instrument instrument = InstrumentDB.getInstrument(dataSrc, instrumentId,
         sensorConfig, runTypeConfig);
-      List<String> test = new ArrayList<String>(
-        instrument.getInternalCalibrations());
-      System.out.println(test);
-      return test;
+      return new ArrayList<String>(instrument.getInternalCalibrations());
     } catch (Exception e) {
       return null;
     }
   }
 
   @Override
-  public String buildHumanReadableCoefficients() {
-    String result = "Not set";
-
-    if (null != coefficients) {
-      result = String.valueOf(coefficients.get(0).getValue());
-    }
-
-    return result;
-  }
-
-  /**
-   * Get the concentration of the external standard
-   *
-   * @return The concentration
-   */
-  public double getConcentration() {
-    if (null == coefficients) {
-      initialiseCoefficients();
-    }
-
-    return coefficients.get(0).getValue();
-  }
-
-  /**
-   * Set the concentration of the external standard
-   *
-   * @param concentration
-   *          The concentration
-   */
-  public void setConcentration(double concentration) {
-    if (null == coefficients) {
-      initialiseCoefficients();
-    }
-
-    coefficients.set(0,
-      new CalibrationCoefficient(getCoefficientNames().get(0), concentration));
-  }
-
-  @Override
-  public boolean coefficientsValid() {
-    boolean result = true;
-
-    if (null != coefficients) {
-      if (coefficients.size() != 2) {
-        result = false;
-      } else {
-        if (getConcentration() < 0) {
-          result = false;
-        }
-        if (getCoefficients().get(1).getValue() != 0.0) {
-          // xH2O must be zero
-          result = false;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  @Override
   public Double calibrateValue(Double rawValue) {
     return rawValue;
-  }
-
-  @Override
-  public List<CalibrationCoefficient> getEditableCoefficients() {
-    // Only the CO2 concentration is editable, and it's the first coefficient.
-    return getCoefficients().subList(0, 1);
   }
 }

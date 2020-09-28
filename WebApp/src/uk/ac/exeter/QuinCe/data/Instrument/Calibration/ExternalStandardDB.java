@@ -201,34 +201,6 @@ public class ExternalStandardDB extends CalibrationDB {
     return EXTERNAL_STANDARD_CALIBRATION_TYPE;
   }
 
-  /**
-   * Determine whether or not a set of standards contains a standard with zero
-   * concentration
-   *
-   * @param standards
-   *          The standards to be checked
-   * @return {@code true} if there is at least one standard with zero
-   *         concentration; {@code false} otherwise
-   */
-  public static boolean hasZeroStandard(CalibrationSet standards) {
-
-    boolean result = false;
-
-    for (Calibration calibration : standards) {
-      if (!(calibration instanceof ExternalStandard)) {
-        throw new CalibrationException(
-          "Calibration set contains non-external-standard");
-      } else {
-        if (((ExternalStandard) calibration).getConcentration() == 0.0) {
-          result = true;
-          break;
-        }
-      }
-    }
-
-    return result;
-  }
-
   @Override
   public boolean priorCalibrationRequired() {
     return true;
