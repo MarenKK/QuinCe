@@ -585,21 +585,29 @@ public class InstrumentDB {
     MissingParam.checkMissing(dataSource, "dataSource");
     MissingParam.checkMissing(owner, "owner");
 
-    Connection conn = null;
     List<InstrumentStub> result = null;
 
-    try {
-      conn = dataSource.getConnection();
+    try (Connection conn = dataSource.getConnection()) {
 
-      if (owner.isAdminUser() || owner.isApprovalUser()) {
-        result = getAllUsersInstrumentList(conn);
-      } else {
-        result = getInstrumentList(conn, owner.getDatabaseID());
-      }
+      result = getInstrumentList(conn, owner);
     } catch (SQLException e) {
       throw new DatabaseException("Error retrieving instrument list", e);
-    } finally {
-      DatabaseUtils.closeConnection(conn);
+    }
+    return result;
+  }
+
+  public static List<InstrumentStub> getInstrumentList(Connection conn,
+    User owner) throws MissingParamException, DatabaseException {
+
+    MissingParam.checkMissing(conn, "connection");
+    MissingParam.checkMissing(owner, "owner");
+
+    List<InstrumentStub> result = null;
+
+    if (owner.isAdminUser() || owner.isApprovalUser()) {
+      result = getAllUsersInstrumentList(conn);
+    } else {
+      result = getInstrumentList(conn, owner.getDatabaseID());
     }
 
     return result;
