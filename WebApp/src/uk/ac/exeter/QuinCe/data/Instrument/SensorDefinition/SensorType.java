@@ -398,7 +398,7 @@ public class SensorType implements Comparable<SensorType> {
   /**
    * Determine whether or not this sensor type is internally calibrated
    *
-   * @return {@code true} if the type is internall calibrated; {@code false} if
+   * @return {@code true} if the type is internally calibrated; {@code false} if
    *         not
    */
   public boolean hasInternalCalibration() {
