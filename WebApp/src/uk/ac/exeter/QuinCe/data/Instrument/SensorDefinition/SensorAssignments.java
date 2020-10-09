@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -797,5 +798,10 @@ public class SensorAssignments
     }
 
     return result;
+  }
+
+  public List<SensorType> getAssignedSensorTypes() {
+    return keySet().stream().filter(s -> null != get(s) && get(s).size() > 0)
+      .collect(Collectors.toList());
   }
 }

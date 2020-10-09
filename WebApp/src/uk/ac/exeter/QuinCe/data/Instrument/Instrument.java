@@ -514,12 +514,12 @@ public class Instrument {
   public TreeSet<String> getInternalCalibrations() {
     TreeSet<String> result = new TreeSet<String>();
 
-    for (Variable variable : variables) {
-      if (variable.hasInternalCalibrations()) {
-        result.addAll(variable.getInternalCalibrations());
+    for (SensorType sensorType : sensorAssignments.getAssignedSensorTypes()) {
+      if (sensorType.hasInternalCalibration()) {
+        result.add(sensorType.getName());
       }
     }
-    System.out.println(result);
+
     return result; // return list
   }
 
