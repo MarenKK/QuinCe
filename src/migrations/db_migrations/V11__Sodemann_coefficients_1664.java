@@ -51,7 +51,6 @@ public class V11__Sodemann_coefficients_1664 extends BaseJavaMigration {
             ResultSet resultSensorType = sensorTypeStmt.executeQuery();
 
             while (resultSensorType.next()) {// && !assignedH2O) {
-              System.out.println(resultSensorType.getString(1));
               if (resultSensorType.getString(1).equals("8")) {
                 assignedH2O = true;
               } else if (resultSensorType.getString(1).equals("9")) {
@@ -72,7 +71,6 @@ public class V11__Sodemann_coefficients_1664 extends BaseJavaMigration {
                   int databaseId = resultCoeff.getInt(1);
                   String[] coeffs = resultCoeff.getString(2).split(";");
                   String xCO2 = coeffs[0];
-                  System.out.println(coeffs.toString());
 
                   try (PreparedStatement setCoeffStmt = conn.prepareStatement(
 
